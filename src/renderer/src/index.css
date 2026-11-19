@@ -1,0 +1,163 @@
+@import 'tailwindcss';
+
+/*
+ * Class-based dark mode.
+ *
+ * Tailwind v4 defaults `dark:` to `prefers-color-scheme`, which cannot express
+ * "follow the system until the user picks a side". The theme hook toggles a
+ * `.dark` class on <html> instead, so an explicit choice always wins.
+ */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+    margin: 0;
+  }
+
+  body {
+    /* The canvas owns selection; a stray text selection while dragging would
+       highlight the whole UI. */
+    user-select: none;
+    -webkit-user-select: none;
+    overflow: hidden;
+    font-family: Inter, 'Segoe UI', system-ui, -apple-system, sans-serif;
+    font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Inputs must remain selectable even though the body is not. */
+  input,
+  textarea {
+    user-select: text;
+    -webkit-user-select: text;
+  }
+
+  /* An offline app has no business showing a "can't reach the network" page. */
+  a {
+    color: inherit;
+  }
+}
+
+@layer components {
+  /* Thin, theme-aware scrollbars for the side panels. */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgb(0 0 0 / 0.16);
+    border: 3px solid transparent;
+    border-radius: 999px;
+    background-clip: content-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgb(0 0 0 / 0.28);
+    background-clip: content-box;
+  }
+
+  .dark ::-webkit-scrollbar-thumb {
+    background: rgb(255 255 255 / 0.18);
+    background-clip: content-box;
+  }
+
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: rgb(255 255 255 / 0.3);
+    background-clip: content-box;
+  }
+
+  /*
+   * Range input styling. Chromium's default slider ignores the theme entirely
+   * and would be the one bright element in a dark UI.
+   */
+  .wb-range {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 16px;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .wb-range::-webkit-slider-runnable-track {
+    height: 4px;
+    border-radius: 999px;
+    background: rgb(0 0 0 / 0.12);
+  }
+
+  .dark .wb-range::-webkit-slider-runnable-track {
+    background: rgb(255 255 255 / 0.16);
+  }
+
+  .wb-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    margin-top: -5px;
+    height: 14px;
+    width: 14px;
+    border-radius: 999px;
+    background: #6366f1;
+    border: 2px solid #fff;
+    box-shadow: 0 1px 3px rgb(0 0 0 / 0.3);
+  }
+
+  .dark .wb-range::-webkit-slider-thumb {
+    border-color: #111827;
+  }
+
+  .wb-range:focus-visible::-webkit-slider-thumb {
+    outline: 2px solid #6366f1;
+    outline-offset: 1px;
+  }
+}
+
+@layer components {
+  /*
+   * Custom title bar.
+   *
+   * `app-region: drag` is what makes a region behave like the OS title bar —
+   * click-and-drag moves the window, and double-click maximises it. The catch
+   * is that a drag region swallows pointer events, so anything interactive
+   * inside it becomes unclickable unless it opts back out with `no-drag`.
+   *
+   * Rather than tagging every button by hand — which is exactly the kind of
+   * thing that silently breaks when someone adds a control later — the second
+   * rule opts out every interactive element type in one place. New buttons in
+   * the title bar therefore work by default.
+   */
+  .wb-titlebar {
+    -webkit-app-region: drag;
+    app-region: drag;
+  }
+
+  .wb-titlebar :is(button, input, textarea, select, a, [role='button'], [role='menuitem'], [data-no-drag]) {
+    -webkit-app-region: no-drag;
+    app-region: no-drag;
+  }
+
+  /*
+   * Safe area for the native window controls.
+   *
+   * `titleBarOverlay` reserves a strip on the right (Windows) or left (macOS)
+   * that DOM elements cannot paint into. These environment variables describe
+   * the remaining usable box, so the bar sizes itself correctly at any DPI and
+   * whichever side the controls land on — no hardcoded pixel width, which would
+   * be wrong on a different Windows build or a scaled display.
+   *
+   * The fallbacks matter: in a plain browser, or on a platform with no overlay,
+   * the variables resolve to nothing and the bar simply spans the full width.
+   */
+  .wb-titlebar-content {
+    margin-left: env(titlebar-area-x, 0px);
+    width: env(titlebar-area-width, 100%);
+    height: env(titlebar-area-height, 100%);
+  }
+}

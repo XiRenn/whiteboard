@@ -1,0 +1,57 @@
+appId: com.xirenn.whiteboard
+productName: Whiteboard
+copyright: Copyright © 2026 xirenn
+
+directories:
+  output: release
+  buildResources: build
+
+# `files` is an allowlist. Only the compiled output and the manifest ship.
+files:
+  - out/**/*
+  - package.json
+  - '!**/*.map'
+  - '!**/*.ts'
+
+asar: true
+compression: maximum
+
+win:
+  icon: build/icon.png
+  target:
+    - target: nsis
+      arch: [x64]
+    - target: portable
+      arch: [x64]
+
+# `nsis` and `portable` MUST have distinct artifactName values.
+# A single top-level `win.artifactName` applies to every Windows target, so both
+# targets resolve to the same filename and one silently overwrites the other.
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  artifactName: ${productName}-${version}-setup.${ext}
+
+portable:
+  artifactName: ${productName}-${version}-portable.${ext}
+
+mac:
+  icon: build/icon.png
+  category: public.app-category.productivity
+  target:
+    - target: dmg
+      arch: [x64, arm64]
+    - target: zip
+      arch: [x64, arm64]
+
+linux:
+  icon: build/icon.png
+  category: Graphics
+  target:
+    - target: AppImage
+      arch: [x64]
+    - target: deb
+      arch: [x64]

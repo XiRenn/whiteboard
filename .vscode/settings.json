@@ -1,0 +1,35 @@
+{
+  // Build output must be excluded from VS Code's file watcher and search
+  // indexer.
+  //
+  // Without this, VS Code watches `release/`, `out/` and the rest, and its
+  // indexer takes handles on the files electron-builder is writing. When the
+  // next build tries to clean up its staging directory it fails with
+  // `EBUSY: resource busy or locked` — the file is held by VS Code, not by any
+  // process the build can see or wait for. The build then appears to fail for
+  // no reason, and the stale staging file stays locked until VS Code closes.
+  //
+  // These directories are generated, huge, and never worth indexing.
+  "files.watcherExclude": {
+    "**/node_modules/**": true,
+    "**/out/**": true,
+    "**/release/**": true,
+    "**/release-*/**": true,
+    "**/dist/**": true,
+    "**/.test-out/**": true,
+    "**/*.tsbuildinfo": true
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/out": true,
+    "**/release": true,
+    "**/release-*": true,
+    "**/dist": true,
+    "**/.test-out": true,
+    "**/*.tsbuildinfo": true
+  },
+  // Electron's own TypeScript definitions are enormous and are not part of this
+  // project's source; excluding them keeps go-to-definition and the file
+  // picker usable.
+  "typescript.tsserver.excludeDirectories": ["node_modules", "out", "release", "release-*", "dist"]
+}
